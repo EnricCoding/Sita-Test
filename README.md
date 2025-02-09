@@ -40,8 +40,8 @@ This project provides two core functionalities:
 ### 1️⃣ Clone the Repository
 
 ```sh
-git clone https://github.com/enric-codiging/site-test.git
-cd sita-test
+git clone https://github.com/EnricCoding/Sita-Test.git
+cd Sita-Test
 ```
 
 ### 2️⃣ Install Dependencies
@@ -131,24 +131,12 @@ npx jest --coverage
 
 ---
 
-## 📌 Code Quality & Best Practices
+## I try to follow this:
 
 ✅ **TypeScript Best Practices** – Strict typing, modular functions.  
 ✅ **SOLID Principles** – Code is maintainable, scalable, and testable.  
 ✅ **Error Handling** – No unhandled promise rejections or crashes.  
 ✅ **Performance Optimizations** – Minimal operations, memory-efficient logic.  
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please fork the repo, create a new branch, and submit a pull request.
-
----
-
-## 📝 License
-
-This project is licensed under the **MIT License**.
 
 ---
 
