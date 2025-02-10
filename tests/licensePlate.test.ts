@@ -1,5 +1,3 @@
-// import { LicensePlateGenerator } from "../src/licensePlate";
-
 import { generateLicensePlate } from "../src/licensePlate";
 
 describe("LicensePlateGenerator", () => {
