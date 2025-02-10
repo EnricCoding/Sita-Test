@@ -11,7 +11,7 @@ describe("fetchWithConcurrency", () => {
         consoleErrorSpy.mockRestore();
     });
     it("should fetch all URLs while respecting max concurrency", async () => {
-        const urls = ["https://api.test/1", "https://api.test/2", "https://api.test/3"];
+        const urls = ["https://api.test/1", "https://api.test/2", "https://api.test/3"]; // 3 URLs that doesnt exist
         const maxConcurrency = 2;
         const responses = await (0, fetchConcurrency_1.fetchWithConcurrency)(urls, maxConcurrency);
         expect(responses.length).toBe(urls.length);
@@ -19,7 +19,7 @@ describe("fetchWithConcurrency", () => {
     });
     it("should handle request failures gracefully", async () => {
         global.fetch.mockImplementationOnce(() => Promise.reject(new Error("Network error")));
-        const urls = ["https://api.test/1"];
+        const urls = ["https://api.test/1"]; // This URL will fail
         const responses = await (0, fetchConcurrency_1.fetchWithConcurrency)(urls, 1);
         expect(responses[0].status).toBe(500);
     });

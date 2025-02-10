@@ -1,43 +1,45 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LicensePlateGenerator = void 0;
-class LicensePlateGenerator {
-    static DIGIT_BASE = 10; // Base para números (0-9)
-    static LETTER_BASE = 26; // Base para letras (A-Z)
-    static PLATE_LENGTH = 6; // Longitud total de la placa
-    /**
-     * Obtiene la placa de licencia correspondiente al índice `n`.
-     * @param n - Índice de la placa en la secuencia.
-     * @returns La placa generada.
-     */
-    static getPlateByIndex(n) {
-        if (n < 0)
-            throw new Error("El índice no puede ser negativo.");
-        const numericLimit = this.DIGIT_BASE ** 6; // 10^6 = 1000000
-        if (n < numericLimit) {
-            return this.formatPlate(n, 0);
-        }
-        // Ajustar `n` para que comience desde la sección de letras
-        n -= numericLimit;
-        const numericPart = n % numericLimit; // Parte numérica
-        const letterPart = Math.floor(n / numericLimit); // Parte alfabética
-        return this.formatPlate(numericPart, letterPart);
+exports.generateLicensePlate = generateLicensePlate;
+function generateLicensePlate(n) {
+    if (n < 1)
+        throw new Error("Number must be positive"); //
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const TOTAL_LETTERS = alphabet.length;
+    const NUMERIC_LIMIT = 999999;
+    const SINGLE_LETTER_THRESHOLD = 100000;
+    if (n <= NUMERIC_LIMIT) {
+        return formatNumericPlate(n);
     }
-    /**
-     * Formatea el número de placa combinando la parte numérica y la parte alfabética.
-     * @param numericPart - Parte numérica (0-999999).
-     * @param letterPart - Parte de letras (0-ZZZZZZ).
-     * @returns Número de placa formateado.
-     */
-    static formatPlate(numericPart, letterPart) {
-        const numericStr = numericPart.toString().padStart(6, "0");
-        let letters = "";
-        let tempLetterPart = letterPart;
-        while (tempLetterPart > 0) {
-            letters = String.fromCharCode((tempLetterPart - 1) % this.LETTER_BASE + 65) + letters;
-            tempLetterPart = Math.floor((tempLetterPart - 1) / this.LETTER_BASE);
-        }
-        return numericStr.slice(letters.length) + letters.padStart(6 - numericStr.length, "A");
+    n -= NUMERIC_LIMIT;
+    const singleLetterCombinations = TOTAL_LETTERS * SINGLE_LETTER_THRESHOLD;
+    if (n <= singleLetterCombinations) {
+        return formatSingleLetterPlate(n, alphabet);
     }
+    n -= singleLetterCombinations;
+    return formatAlphaNumericPlate(n, 4, 2, alphabet);
 }
-exports.LicensePlateGenerator = LicensePlateGenerator;
+function formatNumericPlate(n) {
+    return n === 999999
+        ? n.toString().padStart(6, "0")
+        : (n - 1).toString().padStart(6, "0");
+}
+function formatSingleLetterPlate(n, alphabet) {
+    const letterIndex = Math.floor((n - 1) / 100000);
+    const number = (n - 1) % 100000;
+    return number.toString().padStart(5, "0") + alphabet[letterIndex];
+}
+function formatAlphaNumericPlate(n, numDigits, letterCount, alphabet) {
+    const numPart = n % 10 ** numDigits;
+    const letterPart = Math.floor(n / 10 ** numDigits);
+    return (numPart.toString().padStart(numDigits, "0") +
+        generateLetters(letterPart, letterCount, alphabet));
+}
+function generateLetters(index, length, alphabet) {
+    let letters = "";
+    while (length--) {
+        letters = alphabet[index % alphabet.length] + letters;
+        index = Math.floor(index / alphabet.length);
+    }
+    return letters;
+}

@@ -1,25 +1,60 @@
 import { fetchWithConcurrency } from "./fetchConcurrency";
-import { LicensePlateGenerator } from "./licensePlate";
+import { generateLicensePlate } from "./licensePlate";
 
-(async () => {
-    // ✅ Probar `fetchWithConcurrency`
+async function main(): Promise<void> {
+  try {
+    console.log("Starting tests...\n");
+
     const urls = [
-        "https://jsonplaceholder.typicode.com/todos/1",
-        "https://jsonplaceholder.typicode.com/todos/2"
+      "https://jsonplaceholder.typicode.com/todos/1",
+      "https://jsonplaceholder.typicode.com/todos/2",
     ];
     const maxConcurrency = 2;
-    const responses = await fetchWithConcurrency(urls, maxConcurrency);
-    
-    for (const res of responses) {
-        console.log(await res.json());
-    }
 
-    // ✅ Probar `LicensePlateGenerator`
-    console.log("Placas de prueba:");
-    console.log(LicensePlateGenerator.getPlateByIndex(0)); // "000000"
-    console.log(LicensePlateGenerator.getPlateByIndex(999999)); // "999999"
-    console.log(LicensePlateGenerator.getPlateByIndex(1000000)); // "00000A"
-    console.log(LicensePlateGenerator.getPlateByIndex(9999999)); // "000AAA"
-    console.log(LicensePlateGenerator.getPlateByIndex(50000000)); // "0ZZZZZ"
-    console.log(LicensePlateGenerator.getPlateByIndex(9999999999)); // "ZZZZZZ"
-})();
+    console.log("Fetching URLs with concurrency control...");
+    const responses = await fetchWithConcurrency(urls, maxConcurrency);
+
+    const jsonResults = await Promise.all(
+      responses.map(async (res, index) => {
+        if (!res.ok) {
+          console.error(
+            `Request ${urls[index]} failed with status ${res.status}`
+          );
+          return { error: `Error ${res.status}` };
+        }
+        return res.json();
+      })
+    );
+
+    console.log("Fetched data:", JSON.stringify(jsonResults, null, 2));
+
+    console.log("\n──────────────────────────────────────────\n");
+
+    console.log("Generating license plates.....");
+
+    const testCases = [
+      { input: 1, expected: "000000" },  
+      { input: 2, expected: "000001" },  
+      { input: 999999, expected: "999999" }, 
+      { input: 1000000, expected: "00000A" },
+      { input: 1000001, expected: "00001A" },
+      { input: 1099999, expected: "99999A" },
+      { input: 1100000, expected: "00000B" },
+    ];
+
+    testCases.forEach(({ input, expected }) => {
+      const result = generateLicensePlate(input);
+      console.log(
+        `Input: ${input}, Result: ${result}, Expected: ${expected}, Matches: ${
+          result === expected
+        }`
+      );
+    });
+
+    console.log("\nTests completed successfully.\n");
+  } catch (error) {
+    console.error("An unexpected error occurred:", error);
+  }
+}
+
+main();

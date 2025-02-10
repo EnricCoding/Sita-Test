@@ -3,12 +3,11 @@ export async function fetchWithConcurrency(
   maxConcurrency: number
 ): Promise<Response[]> {
   const results: Response[] = [];
-  const executing: Promise<void>[] = [];
+  const queue: Promise<void>[] = [];
 
   async function fetchUrl(url: string, index: number) {
     try {
-      const response = await fetch(url);
-      results[index] = response;
+      results[index] = await fetch(url);
     } catch (error) {
       console.error(`Error fetching ${url}:`, error);
       results[index] = new Response(null, {
@@ -19,16 +18,16 @@ export async function fetchWithConcurrency(
   }
 
   for (let i = 0; i < urls.length; i++) {
-    const fetchPromise = fetchUrl(urls[i], i).then(() => {
-      executing.splice(executing.indexOf(fetchPromise), 1);
+    const fetchPromise = fetchUrl(urls[i], i).finally(() => {
+      queue.splice(queue.indexOf(fetchPromise), 1);
     });
-    executing.push(fetchPromise);
+    queue.push(fetchPromise);
 
-    if (executing.length >= maxConcurrency) {
-      await Promise.race(executing);
+    if (queue.length >= maxConcurrency) {
+      await Promise.race(queue);
     }
   }
 
-  await Promise.all(executing);
+  await Promise.all(queue);
   return results;
 }

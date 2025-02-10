@@ -1,19 +1,22 @@
-import { LicensePlateGenerator } from "../src/licensePlate";
+// import { LicensePlateGenerator } from "../src/licensePlate";
+
+import { generateLicensePlate } from "../src/licensePlate";
 
 describe("LicensePlateGenerator", () => {
-  it("should generate correct license plates", () => {
-    expect(LicensePlateGenerator.getPlateByIndex(0)).toBe("000000");
-    expect(LicensePlateGenerator.getPlateByIndex(999999)).toBe("999999");
-    expect(LicensePlateGenerator.getPlateByIndex(1000000)).toBe("00000A");
-    expect(LicensePlateGenerator.getPlateByIndex(2000000)).toBe("00000B");
-    expect(LicensePlateGenerator.getPlateByIndex(9999999)).toBe("000AAA");
-    expect(LicensePlateGenerator.getPlateByIndex(50000000)).toBe("0ZZZZZ");
-    expect(LicensePlateGenerator.getPlateByIndex(9999999999)).toBe("ZZZZZZ");
+  test("should generate correct numeric plates", () => {
+    expect(generateLicensePlate(1)).toBe("000000");
+    expect(generateLicensePlate(2)).toBe("000001");
+    expect(generateLicensePlate(999999)).toBe("999999");
   });
 
-  it("should throw an error for negative indices", () => {
-    expect(() => LicensePlateGenerator.getPlateByIndex(-1)).toThrow(
-      "El índice no puede ser negativo."
-    );
+  test("should correctly transition to lettered plates", () => {
+    expect(generateLicensePlate(1000000)).toBe("00000A");
+    expect(generateLicensePlate(1000001)).toBe("00001A");
+    expect(generateLicensePlate(1099999)).toBe("99999A");
+    expect(generateLicensePlate(1100000)).toBe("00000B");
+  });
+
+  test("should throw an error for negative indices", () => {
+    expect(() => generateLicensePlate(-1)).toThrow("Number must be positive");
   });
 });
