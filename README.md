@@ -50,12 +50,6 @@ cd Sita-Test
 npm install
 ```
 
-### 3️⃣ Install Dependencies
-
-```sh
-npm install
-```
-
 ### 3️⃣ Compile the Code
 
 Ensure everything works correctly by running:
